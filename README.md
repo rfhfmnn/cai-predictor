@@ -1,6 +1,8 @@
 # Club Atlético Independiente Match Outcome Predictor
 *Machine Learning Zoomcamp — Midterm Project*
 
+**Live Cloud Deployment (Render):** [https://cai-predictor.onrender.com](https://cai-predictor.onrender.com) | **Healthcheck:** [https://cai-predictor.onrender.com/ping](https://cai-predictor.onrender.com/ping)
+
 ---
 
 ## 1. Problem Description & Context
@@ -224,15 +226,45 @@ python predict_test.py
 
 ## 9. Cloud & Kubernetes Deployment
 
-### Option A: Cloud Deployment (Render / Cloud Run)
-A [`render.yaml`](render.yaml) Blueprint is included for automated deployment on Render:
-1. Connect your GitHub repository to [Render](https://render.com/).
-2. Create a new **Web Service** from the repository or use the Blueprint (`render.yaml`).
-3. Render automatically builds the `Dockerfile` and deploys the container.
-4. Test the live public URL:
-   ```bash
-   python predict_test.py https://<your-service-name>.onrender.com
-   ```
+### Option A: Cloud Deployment (Render) — Live Service
+The service is deployed live on **Render**:
+- **Live Base URL**: [`https://cai-predictor.onrender.com`](https://cai-predictor.onrender.com)
+- **Healthcheck Endpoint**: `https://cai-predictor.onrender.com/ping`
+- **Prediction Endpoint**: `https://cai-predictor.onrender.com/predict`
+
+> [!NOTE]
+> Free-tier Render web services spin down after inactivity and may take 30–50 seconds to cold-start on the first request.
+
+#### Testing the Live Render Deployment:
+Run the test script directly against the live URL:
+```bash
+python predict_test.py https://cai-predictor.onrender.com
+```
+
+Or using `curl`:
+```bash
+curl -X POST https://cai-predictor.onrender.com/predict \
+  -H "Content-Type: application/json" \
+  -d '{"rival": "Racing Club", "condicion_independiente": "Local", "anio": 2026}'
+```
+
+Expected output:
+```json
+{
+  "match": {
+    "anio": 2026,
+    "condicion_independiente": "Local",
+    "rival": "Racing Club"
+  },
+  "non_win_probability": 0.8793,
+  "prediction": "No Victoria",
+  "threshold_used": 0.41,
+  "victory": false,
+  "win_probability": 0.1207
+}
+```
+
+A [`render.yaml`](render.yaml) Blueprint is included for automated infrastructure-as-code deployment on Render.
 
 ### Option B: Local or Remote Kubernetes Deployment
 Declarative Kubernetes manifests are provided under [`k8s/`](k8s/):
